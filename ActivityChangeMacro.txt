@@ -1,0 +1,267 @@
+
+ Dim main As Worksheet
+ Dim first As Worksheet
+ Dim second As Worksheet
+ Dim third As Worksheet
+ Dim fourth As Worksheet
+
+Sub ChangeActivity()
+    Application.ScreenUpdating = False
+    
+ Set main = ActiveWorkbook.Sheets("Main Page")
+ Set first = ActiveWorkbook.Sheets("First")
+ Set second = ActiveWorkbook.Sheets("Second")
+ Set third = ActiveWorkbook.Sheets("Third")
+ Set fourth = ActiveWorkbook.Sheets("Fourth")
+  If IsEmptyRange = False Then
+    If FindName = True Then
+        MsgBox "Name has been found"
+       If CheckActivity = False Then
+        If ChangeIt = True Then
+            MsgBox "Activity has been changed"
+            main.Range("H5").Clear
+            Sheets("Main Page").Select
+            Exit Sub
+        Else
+          MsgBox "Activity Failed to change"
+          Sheets("Main Page").Select
+         Exit Sub
+         End If
+       Else
+          Sheets("Main Page").Select
+          Exit Sub
+       End If
+    
+    Else
+      MsgBox "Name was not found"
+      Sheets("Main Page").Select
+      Exit Sub
+    End If
+  Else
+    Sheets("Main Page").Select
+    Exit Sub
+  End If
+  
+Sheets("Main Page").Select
+
+End Sub
+
+Public Function IsEmptyRange() As Boolean
+ Dim cell As Range
+ Dim bIsEmpty As Boolean
+ bIsEmpty = False
+ 
+ For Each cell In main.Range("H5:K5")
+     If IsEmpty(cell) = True Then
+         'An empty cell was found. Exit loop
+         bIsEmpty = True
+         Exit For
+     End If
+ Next cell
+
+ If bIsEmpty = True Then
+     MsgBox "Be sure all information is filled out correctly"
+     IsEmptyRange = True
+     Exit Function
+ End If
+
+End Function
+
+Public Function FindName() As Boolean
+    Dim cells As Range
+    Dim name As Range
+    Dim found As Boolean
+    found = False
+    
+    If main.Range("I5") = 1 Then
+       Set cells = first.Range("D4:Y50")
+    ElseIf main.Range("I5") = 2 Then
+       Set cells = second.Range("D4:Y50")
+    ElseIf main.Range("I5") = 3 Then
+        Set cells = third.Range("D4:Y50")
+    ElseIf main.Range("I5") = 4 Then
+        Set cells = fourth.Range("D4:Y50")
+    Else
+        End If
+    
+    For Each name In cells
+        If name = main.Range("H5") Then
+            found = True
+            Exit For
+        End If
+    Next name
+        
+    If found = True Then
+        FindName = True
+    Else
+        FindName = False
+        Exit Function
+        End If
+        
+    
+End Function
+
+Public Function CheckActivity() As Boolean
+ Dim cells As Range
+ Dim activity As Range
+ Dim limit As Range
+ Dim found As Boolean
+ Dim count As Integer
+ Dim x As Integer
+ capped = False
+ x = -1
+ 
+ 
+ If main.Range("I5") = 1 Then
+       Set cells = first.Range("D3:Y3")
+       Sheets("First").Select
+    ElseIf main.Range("I5") = 2 Then
+       Set cells = second.Range("D3:Y3")
+       Sheets("Second").Select
+    ElseIf main.Range("I5") = 3 Then
+        Set cells = third.Range("D3:Y3")
+        Sheets("Third").Select
+    ElseIf main.Range("I5") = 4 Then
+        Set cells = fourth.Range("D3:Y3")
+        Sheets("Fourth").Select
+    Else
+        End If
+        
+  For Each activity In cells
+    If main.Range("K5") = activity Then
+        activity.Select
+        Do Until IsEmpty(ActiveCell)
+            ActiveCell.Offset(1, 0).Select
+            x = x + 1
+        Loop
+        Exit For
+    Else
+        End If
+  Next activity
+    
+  For Each limit In cells
+    If main.Range("K5") = limit Then
+       limit.Select
+       ActiveCell.Offset(-1, 0).Select
+       count = ActiveCell.Value
+       Exit For
+    Else
+        End If
+  Next limit
+  
+  If count = 0 Then
+    CheckActivity = True
+    MsgBox "Activity is Not Available"
+    Exit Function
+  ElseIf x >= count Then
+    CheckActivity = True
+    MsgBox "Activity is Full"
+    Exit Function
+  Else
+    MsgBox "Activity is Available"
+    End If
+    
+
+End Function
+
+Public Function ChangeIt() As Boolean
+    Dim cells As Range 'activity names
+    Dim activity As Range 'looping to find activity
+    Dim names As Range 'names in the sheet
+    Dim find As Range 'looping to find name
+    Dim old As Range 'Names being moved from old activity
+    Dim rng2 As Range
+    Dim move As Range
+    
+    Dim changed As Boolean
+    Dim camper As String
+    Dim blank As Range
+    changed = False
+    
+'Sets the ranges for the needed loops
+If main.Range("I5") = 1 Then
+       Set cells = first.Range("D3:Y3")
+       Set names = first.Range("D4:Y50")
+       Sheets("First").Select
+    ElseIf main.Range("I5") = 2 Then
+       Set cells = second.Range("D3:Y3")
+       Set names = second.Range("D4:Y50")
+       Sheets("Second").Select
+    ElseIf main.Range("I5") = 3 Then
+        Set cells = third.Range("D3:Y3")
+        Set names = third.Range("D4:Y50")
+        Sheets("Third").Select
+    ElseIf main.Range("I5") = 4 Then
+        Set cells = fourth.Range("D3:Y3")
+        Set names = fourth.Range("D4:Y50")
+        Sheets("Fourth").Select
+    Else
+        End If
+
+'Finds and eliminates the camper name
+ For Each find In names
+        If find = main.Range("H5") Then
+            find.Select
+            find.Value = camper
+            ActiveCell.Clear
+            Exit For
+        End If
+    Next find
+
+'Moves campers name in old activity so there is no gap
+For Each activity In cells
+    If main.Range("J5") = activity Then
+        activity.Select
+        Do Until IsEmpty(ActiveCell)
+            ActiveCell.Offset(1, 0).Select
+            Set old = ActiveCell
+        Loop
+            old.Offset(1, 0).Select
+        Exit For
+    Else
+        End If
+  Next activity
+
+     Do Until IsEmpty(ActiveCell)
+        If Not rng2 Is Nothing Then
+            Set rng2 = Union(ActiveCell, rng2)
+            ActiveCell.Offset(1, 0).Select
+        Else
+            Set rng2 = ActiveCell
+        End If
+      Loop
+
+    If IsEmpty(rng2) Then
+        rng2.Cut
+        ActiveCell.Offset(-1, 0).Select
+        Do Until IsEmpty(ActiveCell)
+            ActiveCell.Offset(-1, 0).Select
+     Loop
+    End If
+     ActiveCell.Insert
+' Gap should be removed
+    
+For Each move In cells
+    If main.Range("K5") = move Then
+        move.Select
+        Do Until IsEmpty(ActiveCell)
+            ActiveCell.Offset(1, 0).Select
+        Loop
+        camper = main.Range("H5")
+        ActiveCell.Value = camper
+        changed = True
+        Exit For
+    Else
+        End If
+  Next move
+  
+  If changed = True Then
+    ChangeIt = True
+    Exit Function
+  Else
+    ChangeIt = False
+    Exit Function
+  End If
+  
+End Function
+
